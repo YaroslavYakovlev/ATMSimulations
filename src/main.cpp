@@ -2,18 +2,21 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include "header.h"
+#include <ctime>
 
-  std::ifstream bankOut("..\\src\\File\\ATM_info.txt", std::ios::binary);
-  std::ofstream bankIn("..\\src\\File\\ATM_info.txt", std::ios::app);
+std::fstream bank("..\\src\\File\\ATM_info.txt", std::ios::app);
+int numberBills;
+int nominal[] = {100, 200, 500, 1000, 2000, 5000};
 
 void fillingATM(){
   std::cout << "Filling the ATM" << std::endl;
   numberBills = 20; 
+  int arr[1000];
+  std::srand((time(NULL)));
   for(int i = 0; i < numberBills; ++i){
     if(arr[i] == 0){
       arr[i] = nominal[std::rand() % 6];
-      bankIn << arr[i] << "\n";
+      bank << arr[i] << "\n";
     }
   }  
 }
@@ -21,38 +24,39 @@ void fillingATM(){
 void removingBanknotes(){
   std::cout << "Removing banknotes" << std::endl;
   std::cout << "How much do you want to withdraw?" << std::endl;
+  int money;
   std::cin >> money;
   if(money % 100 != 0){
     std::cerr << "Error data: " << money << std::endl;
   }else{
     int mas[1000];
-    bankOut.read((char*)mas, sizeof(mas));
+    bank.read((char*)mas, sizeof(mas));
     int numberSpecies = sizeof(nominal) / sizeof(nominal[0]);
     std::vector<int> numbers(numberSpecies + 1, 0);
     for(int i = 0; i < numberBills; ++i){
-      if(mas[i] == 5000) ++numbers[6];
-      else if(mas[i] == 2000) ++numbers[5];
-      else if(mas[i] == 1000) ++numbers[4];
-      else if(mas[i] == 500) ++numbers[3];
-      else if(mas[i] == 200) ++numbers[2];
-      else if(mas[i] == 100) ++numbers[1];
-      else ++numbers[0];
+      if(mas[i] == 5000) 
+        ++numbers[5];
+      else if(mas[i] == 2000) ++numbers[4];
+      else if(mas[i] == 1000) ++numbers[3];
+      else if(mas[i] == 500) ++numbers[2];
+      else if(mas[i] == 200) ++numbers[1];
+      else if(mas[i] == 100) ++numbers[0];
+      // else ++numbers[0];
     }
   }
-
-
 }
 
 int main(){
   std::cout << "ATM" << std::endl;
-  if(bankIn.is_open() && bankOut.is_open()){
+  char action;
+  if(bank.is_open() && bank.is_open()){
     std::cin >> action;
     if(action == '+'){      
       fillingATM();
     }else if(action == '-'){
       int size = 0;
-      bankOut.seekg (0, std::ios::end);
-      size = bankOut.tellg();
+      bank.seekg (0, std::ios::end);
+      size = bank.tellg();
       if(size != 0){
         removingBanknotes();
       }else {
